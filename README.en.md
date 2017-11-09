@@ -1,6 +1,6 @@
 # RCML - Documentation for developers
 
-- [ 1. Creating Own Modules for RCML](#1-creating-own-modules-for-rcml)
+- [1. Creating Own Modules for RCML](#1-creating-own-modules-for-rcml)
 	- [1.1 Robot Module](#11-robot-module)	
 		- [1.1.1 Robot Module Library API](#111-robot-module-library-api)
 		- [1.1.2 Robot module API](#112-robot-module-api)
@@ -30,10 +30,10 @@
 		- [1.3.1 Control module library API](#31-control-module-library-api)
 		- [1.3.2 Control module API](#132-control-module-api)
 		- [1.3.3 The *execute* Method](#133-the-execute-method)
-	- [1.4 Choosing module](#14-choosing-module)	
-		- [1.4.1 Chosing module library API](#141-chosing-module-library-api)
-		- [1.4.2 Chosing module API](#142-chosing-module-api)
-		- [1.4.3 The *makeChoise* Method](#143-the-makechoise-method)
+	- [1.4 Robot choice module](#14-robot-choice-module)	
+		- [1.4.1 Robot choice module API library ](#141-robot-choice-module-api-library)
+		- [1.4.2 Robot choice module API](#142-robot-choice-module-api)
+		- [1.4.3 The *makeChoiсe* Method](#143-the-makechoise-method)
 - [2. About interface identifiers for modules](#2-about-interface-identifiers-for-modules)
 - [3. Work with RCML statistics](#3-work-with-rcml-statistics)
 	- [3.1 General information and recommendations](#31-general-information-and-recommendations)
@@ -58,13 +58,13 @@ However, the names of these functions, as well as the result returned depend on 
 
 These functions are called only once at the launch of the compiler or interpreter. Accordingly, it is guaranteed that the object with a pointer returned by this function, is always in the singular as part of a single instance of *RCML* environment.
 
-**Attention!** Developer should remember that it is possible to run several interpreters and/or compillers at the same time to solve different tasks, so each laucnhed instance wiil call functions and critical methods for handling equipment such as *init, final, destroy* from the module file in the process of their work. According to the nuances of multithreading, it should be noted that their call can be simultaneous in time.
+**Attention!** Developer should remember that it is possible to run several interpreters and/or compilers at the same time to solve different tasks, so each launched instance wil call functions and critical methods for handling equipment such as *init, final, destroy* from the module file in the process of their work. According to the nuances of multi-threading, it should be noted that their call can be simultaneous in time.
 
 **Attention!** Also remember that when the compiler is running, the methods of the modules are called from the same thread, because the compiler is single-threaded When the interpreter methods are used, they can be called from different sources at arbitrary times, rather than strictly sequentially.
 
 **All modules that work with the equipment must be thread-safe.**
 
-It is highly recomended to use a *singletone* design pattern in the process of robot module developement, consider that the calls of the robot module methods can happen from different threads and even simultaneously.
+It is highly recommended to use a *singletone* design pattern in the process of robot module development, consider that the calls of the robot module methods can happen from different threads and even simultaneously.
 
 ## 1.1 Robot Module
 
@@ -156,7 +156,7 @@ void colorPrintfFromModuleVA(void *module, ConsoleColor colors, const char *mask
 void colorPrintfFromModule(void *module, ConsoleColor colors, const char *mask,...);
 ```
 
-A pointer to the current instance of robot module, i.e. this must be sent as *module* parameter. *ConsoleColor* structure must be sent as colors parameter. This parameter sets the output color at the console. The third parameter *mask* defines formatting mask similar to printf function from the standard library of *C++*. Further, depending on output function, according to the defined formatting mask, goes common enumeration of parameters or enumeration of parameters in the form of *va_list* structure from *std_arg.h*.
+A pointer to the current instance of robot module, i.e. this must be sent as *module* parameter. *ConsoleColor* structure must be sent as colors parameter. This parameter sets the output color at the console. The third parameter *mask* defines formatting mask similar to *printf* function from the standard library of *C++*. Further, depending on output function, according to the defined formatting mask, goes common enumeration of parameters or enumeration of parameters in the form of *va_list* structure from *std_arg.h*.
 
 #### 1.1.2.3 The *getFunctions* Method
 
@@ -265,7 +265,7 @@ The *startProgram* method is only called by the interpreter before executing the
 
 #### 1.1.2.10 The *getAviableRobots* Method 
 
-This method is called when the robot with choise module is activated. This method is used to provide information about free robots to the choise modules, so that they can select the robot accordingly.
+This method is called when the robot with choice module is activated. This method is used to provide information about free robots to the choice modules, so that they can select the robot accordingly.
 
 The *getAviableRobots* method returns a pointer to the *AviableRobotsResult* structure, which contains information about all the robots that are available in this module at the time of request.
 
@@ -341,7 +341,7 @@ void colorPrintfFromRobotVA(void *robot, const char *uniq_name, ConsoleColor col
 void colorPrintfFromRobot(void *robot, const char *uniq_name, ConsoleColor colors, const char *mask, ...);
 ```
 
-A pointer to the current instance of robot representation, i.e., this must be sent as robot parameter. *uniq_name* parameter can sent a pointer to a line – robot name, or it can be *NULL* value, then robot name will be replaced by its serial number at the output. *ConsoleColor* structure must be sent as colors parameter. The third parameter (*mask*) defines formatting mask similar to printf function from the standard library of *C++*. Further, depending on output function, according to the defined formatting mask, goes common enumeration of parameters or enumeration of parameters in the form of va_list structure from std_arg.h.
+A pointer to the current instance of robot representation, i.e., this must be sent as robot parameter. *uniq_name* parameter can sent a pointer to a line – robot name, or it can be *NULL* value, then robot name will be replaced by its serial number at the output. *ConsoleColor* structure must be sent as colors parameter. The third parameter (*mask*) defines formatting mask similar to *printf* function from the standard library of *C++*. Further, depending on output function, according to the defined formatting mask, goes common enumeration of parameters or enumeration of parameters in the form of va_list structure from std_arg.h.
 
 #### 1.1.3.2 The *getUniqName* Method
 
@@ -387,7 +387,6 @@ This method can be called specifying one of the following system values (named c
 - *ROBOT_COMMAND_FREE* – is sent when this particular robot will be no more needed to the program. It should be noted that this parameter applies only to notify a certain robot that it will be further released, but it is not a command to release the robot for robot module. To release the robot, robotFree method of robot module is called;
 - *ROBOT_COMMAND_HAND_CONTROL_BEGIN* – preparing a robot to switch to hand control mode; after processing this command, the commands will no more be sent to the robot, and axis values will be sent through axisControl method;
 - *ROBOT_COMMAND_HAND_CONTROL_END* – exiting hand control mode.
-
 
 #### 1.1.3.4 The *axisControl* Method 
 
@@ -442,7 +441,7 @@ class FunctionModule {
   virtual ~FunctionModule() {}
 };
 ```
-The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* methods are completely similar to the homonymous methods of the robot module.
+The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* are completely analogous to the same methods of the robot module.
 
 *getFunctions* method is similar to the same method of robot module; when it is called, function module must return a list of functions that it provides for calling from RCML environment.
 
@@ -495,7 +494,7 @@ class ControlModule {
   virtual ~ControlModule() {}
 };
 ```
-The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* methods are completely similar to the homonymous methods of the robot module.
+The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* are completely analogous to the same methods of the robot module.
 
 *getAxis* method is similar to the same method in robot module, but when calling, control module must return a list of control axes that it provides for linking in the call of *hand_control* system function.
 
@@ -507,11 +506,11 @@ typedef void (*sendAxisState_t)(ControlModule *, system_value, variable_value);
 ```
 This function must be called each time when the control device changes a value of the control axis. A pointer to this control module is sent as the first parameter of this function, followed by a unique axis identifier that was specified in the data returned by *getAxis* method. A new value of this axis is sent as the last parameter.
 
-### 1.4 Choosing module
+### 1.4 Robot choice module
 
 The choosing modules provide algorithms for decision-making. Like other modules, the choosing modules have methods that are common to all modules, as first described in the Section ["Robot Module"](#1-1-robot-module).
 
-#### 1.4.1 Chosing module library API
+#### 1.4.1 Robot choice module API library 
 
 The library of the choosing module should export the following functions:
 ```
@@ -520,7 +519,7 @@ ControlModule *getChoiceModuleObject();
 ```
 Further, the abstract control module will be understood as the *ChoiceModule* class, which describes the interface of a choosing module, and, accordingly, the class to which the returned pointer is pointing should inherit from it, and override all virtual methods of this class, preserving the mode of calling then; this child class will be further referred to as the statistics module.
 
-#### 1.4.2 Chosing module API
+#### 1.4.2 Robot choice module API
 
 *ChoiceModule* class description in C++:
 ```
@@ -553,9 +552,9 @@ Further, the abstract control module will be understood as the *ChoiceModule* cl
   virtual ~ChoiceModule() {}
 };
 ```
-The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* methods are completely similar to the homonymous methods of the robot module.
+The *getModuleInfo, prepare, writePC, readPC, init, final, startProgram, endProgram* and *destroy* are completely analogous to the same methods of the robot module.
 
-#### 1.4.3 The *makeChoise* Method
+#### 1.4.3 The *makeChoiсe* Method
 
 The *makeChoice* method is called when the choosing module is required to make a decision about choosing a robot. It is in this method that the robot choosing logic has been implemented. The following parameters are passed to the input of this method:
 
@@ -686,4 +685,4 @@ The list of involved robots for execution of called functions is stored in the t
 - *id* - unique robot identifier, primary key;
 - *source_id* - source identifier, in this case the source can only be a robot module, a foreign key, refers to the *id* field in the *sources* table;
 - *uid* - the name of the robot, which should be recommended to make unique, but it may not be such.
-	
+***
